@@ -1,0 +1,83 @@
+modality: ecg
+task_type: multiclass_classification
+dataset: mimic
+
+time_steps: 1992
+
+transforms:
+  crop_lower_bnd: 1.0
+  crop_upper_bnd: 1.0
+apply_augmentations: true
+augmentations:
+  ft_surr_phase_noise: 0.075
+  jitter_sigma: 0.2
+  rescaling_sigma: 0.5
+  time_flip_prob: 0.33
+  sign_flip_prob: 0.33
+
+target: lvef # just for project name
+
+# Head
+num_head_layers: 1
+head_dropout: 0.0
+non_linearity: leaky_relu
+num_classes: 3
+
+batch_size: 32
+accum_iter: 1
+num_workers: 4
+max_epochs: 50
+
+params:
+  lr: 3e-4
+  weight_decay: 0.01
+  layer_decay: 0.8
+  optimizer:
+    adamw:
+      use: true
+      betas: [0.9, 0.999]
+    lars:
+      use: false
+      momentum: 0.9
+      nesterov: true
+    adam:
+      use: false
+      betas: [0.9, 0.999]
+    sgd:
+      use: false
+      momentum: 0.9
+      nesterov: true
+  scheduler:
+    warmup_cosine:
+      use: false
+      warmup_steps: 5 # unit: epochs
+      total_steps: ${downstream_task_ecg.max_epochs} # unit: epochs
+      min_lr_factor: 0
+    cosine:
+      use: false
+      T_max: 200
+      eta_min: 0.01  
+    step:
+      use: false
+      step_size: 60
+      gamma: 0.1
+    exponential:
+      use: false
+      gamma: 0.95
+
+  early_stopping:
+    use: false
+    patience: 8
+    min_delta: 0.075
+
+paths:
+  type: _balanced
+
+  data_train: ${home_dir}/datasets/mimic/lvef_classification/train${downstream_task_ecg.paths.type}.csv
+  labels_train: ${home_dir}/datasets/mimic/lvef_classification/labels_train${downstream_task_ecg.paths.type}.pt
+
+  data_val: ${home_dir}/datasets/mimic/lvef_classification/val.csv
+  labels_val: ${home_dir}/datasets/mimic/lvef_classification/labels_val.pt
+
+  data_test: ${home_dir}/datasets/mimic/lvef_classification/test.csv
+  labels_test: ${home_dir}/datasets/mimic/lvef_classification/labels_test.pt

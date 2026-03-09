@@ -1,0 +1,53 @@
+ecg:
+  # input data
+  input_channels: 1
+  input_variates: 12
+  time_steps: 1008
+  input_size: ["${model.ecg.input_channels}", "${model.ecg.input_variates}", "${model.ecg.time_steps}"]
+
+  # model
+  model_name: vit_baseDeep_patchX
+  patch_height: 1
+  patch_width: 24
+  patch_size: [1, 24]
+  drop_path_rate: 0.1
+  use_adapter: false
+  adapter_bottleneck_dim: 64
+  nb_classes: 1
+  ignore_pos_embed_y: false
+  freeze_pos_embed_y: false
+
+  # use gradient checkpoint
+  use_checkpoint: true
+
+echo:
+  # input data
+  img_size: 224
+  num_frames: 16
+  num_channels: 3
+
+  view_dropout:
+    use: false
+    mask_ratio: 0.0
+
+  view_aggregation:
+    use: true
+    strategy: att # relevant only if view_aggregation.use == True. options: att / mean / cls
+    num_heads: 4 # only relevant for att / cls
+    dropout: 0.1 # only relevant for cls
+    num_layers: 1 # only relevant for cls
+    proj_embed_dim: 512 # the embed dimension before view aggregation
+
+# token aggregation
+token_aggregation:
+  ecg:
+    strategy: mean # mean / max / attention / cls
+    num_heads: 4 # only relevant for attention
+
+alignment:
+  proj_embed_dim: 512
+  width_factor: 8
+  alignment_type: linear # options: sail / simclr / legacy / linear
+  sail:
+    sharelock: false
+    linear_type: star

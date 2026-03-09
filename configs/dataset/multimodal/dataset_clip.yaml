@@ -1,0 +1,43 @@
+batch_size: 256
+accum_iter: 1
+num_workers: 8
+pin_memory: true
+
+# ecg-echo pairs
+pairs_dir: internal
+paths:
+  data_train: ${home_dir}/datasets/${dataset.pairs_dir}/pretrain/paired_ecg_echo.csv
+  data_val: ${home_dir}/datasets/${dataset.pairs_dir}/val/paired_ecg_echo.csv
+  data_test: ${home_dir}/datasets/${dataset.pairs_dir}/test/paired_ecg_echo.csv
+
+# ecg
+ecg:
+  use_precomputed_embeds: false
+  dataset_name: internal
+  embeddings_filename: otis_ecg_embeddings.pt
+  embeddings_filepath: ${home_dir}/datasets/${dataset.ecg.dataset_name}/embeddings/${dataset.ecg.embeddings_filename}
+  transforms:
+    crop_lower_bnd: 1.0
+    crop_upper_bnd: 1.0
+  apply_augmentations: true
+  augmentations:
+    ft_surr_phase_noise: 0.075
+    jitter_sigma: 0.2
+    rescaling_sigma: 0.5
+    time_flip_prob: 0.33
+    sign_flip_prob: 0.33
+
+# echo
+echo:
+  use_precomputed_embeds: true
+  dataset_name: internal
+  embeddings_filename: echoprime_echo_embeddings_unnorm.pt
+  embeddings_filepath: ${home_dir}/datasets/${dataset.echo.dataset_name}/embeddings/${dataset.echo.embeddings_filename}
+  apply_augmentations: true
+  augmentations:
+    random_horizontal_flip: 0.5
+    random_vertical_flip: 0.5
+    random_rotation: [0, 180]
+    random_crop_size: 196
+  sampling_rate: 2
+  max_n_views: 128 # relevant for echo studies

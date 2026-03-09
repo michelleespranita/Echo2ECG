@@ -1,0 +1,25 @@
+defaults:
+  - _self_
+  - dataset: multimodal/dataset_retrieval
+  - model: multimodal/model_retrieval
+  - train: multimodal/retrieval
+
+seed: 42
+
+home_dir: /home/michellel
+model_dir: /home/michellel/repos/Echo2ECG
+experiment_name:
+
+num_gpus: 1
+
+# Logging
+save_dir: ${home_dir}/training_logs/lightning-mmcl-ecg-echo/
+save_embeddings: true
+
+# Eval mode
+eval_mode: all # options: pretrain / val / test / all
+
+# UMAP settings
+plot_umap: true
+umap_n_neighbors: 15
+umap_min_dist: 0.1

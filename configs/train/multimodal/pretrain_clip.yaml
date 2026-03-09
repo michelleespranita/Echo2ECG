@@ -1,0 +1,70 @@
+task: multimodal_pretrain_clip
+
+# freezing
+encoder:
+  ecg:
+    checkpoint_path: ${home_dir}/model_weights/ecg_unimodal_otis.pth
+    freeze_first_n_layers: 0
+
+  echo:
+    checkpoint_path: ${home_dir}/model_weights/echo_prime_encoder.pt
+    freeze_first_n_layers: 16
+
+# loss fn
+clip_loss:
+  temperature: 0.5
+  lambda_0: 0.5
+  learnable_temperature: false
+
+# autocast
+use_autocast: true
+
+params:
+  lr: 5e-4
+  lr_ecg_encoder: 5e-4
+  lr_echo_encoder: 5e-4
+
+  weight_decay: 1e-7
+  weight_decay_ecg_encoder: 1e-7
+  weight_decay_echo_encoder: 1e-7
+
+  layer_decay: 0.75
+  
+  optimizer:
+    adamw:
+      use: true
+      betas: [0.9, 0.999]
+    lars:
+      use: false
+      momentum: 0.9
+      nesterov: true
+    adam:
+      use: false
+      betas: [0.9, 0.999]
+    sgd:
+      use: false
+      momentum: 0.9
+      nesterov: true
+
+  scheduler:
+    warmup_cosine:
+      use: true
+      min_lr_factor: 0.1
+      warmup_steps: 5
+      total_steps: ${max_epochs}
+    cosine:
+      use: false
+      T_max: 200
+      eta_min: 0.01  
+    step:
+      use: false
+      step_size: 60
+      gamma: 0.1
+    exponential:
+      use: false
+      gamma: 0.95
+  
+  early_stopping:
+    use: false
+    patience: 5 # unit: # evaluations
+    min_delta: 0

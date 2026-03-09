@@ -1,0 +1,34 @@
+defaults:
+  - _self_
+  - dataset: multimodal/dataset_clip
+  - model: multimodal/model_clip
+  - train: multimodal/pretrain_clip
+  - downstream_task_ecg: multiclass_lvef_classification_mimic
+
+seed: 42
+
+home_dir: /home/michellel/repos/Echo2ECG
+experiment_name:
+
+# Training
+num_gpus: 1
+max_epochs: 50
+save_top_k: -1
+save_model_every_n_epochs: 5
+check_val_every_n_epoch: 1 # how often validation is run
+log_every_n_steps: 10 # how often metrics are logged
+grad_accumulation_steps: 1
+
+online_eval_every_n_epoch: 1
+online_eval_warmup_epochs: 1
+online_eval_max_epochs: 10
+online_eval_first_n_samples_train: 1000
+online_eval_first_n_samples_val: 500
+
+linear_probe_every_n_epoch: 1
+
+# Logging
+save_dir: ${home_dir}/training_logs
+
+# Resume from checkpoint
+resume_from_checkpoint_path:

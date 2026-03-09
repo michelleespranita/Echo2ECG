@@ -1,0 +1,4 @@
+task: multimodal_retrieval
+
+# For determining threshold for calculating ground-truth
+tolerance: 0.5

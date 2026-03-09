@@ -1,0 +1,33 @@
+defaults:
+  - _self_
+  - dataset: ecg/dataset_linearprobe
+  - model: ecg/model_linearprobe
+  - train: ecg/linearprobe
+  - downstream_task_ecg: binary_shd_classification_echonext
+
+seed: 42
+
+home_dir: /home/michellel/repos/Echo2ECG
+experiment_name:
+
+num_gpus: 1
+save_top_k: 1 # needed for testing bc it's gonna call configure_callbacks
+
+test: false
+validate: true
+
+# Logging
+save_dir: ${home_dir}/training_logs
+
+# Checkpoints
+encoder_project_name:
+encoder_experiment_name:
+
+# ECG encoder checkpoint path
+ecg_encoder_checkpoint_path: ${save_dir}/${encoder_project_name}/${encoder_experiment_name}/checkpoints/ecg_multimodal.ckpt
+
+# Token aggregator from multimodal pretraining (CLIP)
+token_aggregator_path: ${save_dir}/${encoder_project_name}/${encoder_experiment_name}/checkpoints/token_aggregator.ckpt
+
+# ECG alignment layer from multimodal pretraining (CLIP) (optional)
+ecg_alignment_path: ${save_dir}/${encoder_project_name}/${encoder_experiment_name}/checkpoints/ecg_alignment_global_token.ckpt

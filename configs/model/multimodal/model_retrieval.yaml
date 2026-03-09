@@ -1,0 +1,13 @@
+experiment_dir: /home/michellel/training_logs/lightning-mmcl-ecg-echo/Multimodal-Pretrain-CLIP
+experiment_name: B100_e10_Uni_fECG0_fEcho0___tokECGmean_tokEchomean_sail_lr0.0003_lrECG0.0003_lrEcho0.0003_wd1e-07_wdECG1e-07_wdEcho1e-07_lrd0.75_clip_T0.1_L0.5_n-to-n_1days_wo_20k
+experiment_path: ${model.experiment_dir}/${model.experiment_name}
+checkpoint_mode: last # last / component / epoch
+checkpoint_name: 
+
+echo:
+  view_dropout:
+    use: false
+    mask_ratio: 0.0
+  view_aggregation:
+    use: true 
+    strategy: att

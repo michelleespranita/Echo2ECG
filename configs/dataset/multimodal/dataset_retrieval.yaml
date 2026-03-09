@@ -1,0 +1,34 @@
+batch_size: 64
+
+# ecg-echo pairs
+dataset_name: internal
+pairs_dir: internal
+paths:
+  data_train: ${home_dir}/datasets/${dataset.pairs_dir}/pretrain/paired_ecg_echo.csv
+  data_val: ${home_dir}/datasets/${dataset.pairs_dir}/val/paired_ecg_echo.csv
+  data_test: ${home_dir}/datasets/${dataset.pairs_dir}/test/paired_ecg_echo.csv
+
+  data_train_study: ${home_dir}/datasets/${dataset.pairs_dir}/pretrain/paired_ecg_echo.csv
+  data_val_study: ${home_dir}/datasets/${dataset.pairs_dir}/val/paired_ecg_echo.csv
+  data_test_study: ${home_dir}/datasets/${dataset.pairs_dir}/test/paired_ecg_echo.csv
+
+  # metadata
+  metadata: ${home_dir}/datasets/${dataset.dataset_name}/echo/raw/metadata.csv
+
+ecg:
+  sig_len: 1008
+
+echo:
+  img_size: 224
+  num_frames: 16
+  num_channels: 3
+  sampling_rate: 2
+  apply_augmentations: false
+  max_n_views: 128
+  dataset_name: internal
+  use_precomputed_embeds: true
+  embeddings_filename: echoprime_echo_embeddings_unnorm.pt
+  embeddings_filepath: ${home_dir}/datasets/${dataset.echo.dataset_name}/embeddings/${dataset.echo.embeddings_filename}
+
+# Cardiac phenotype to build ground-truth
+phenotype:

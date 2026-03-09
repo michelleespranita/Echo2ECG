@@ -1,0 +1,12 @@
+*.pt
+**/job_outputs/
+**/.ipynb_checkpoints/
+**/*.egg-info/
+**/__pycache__/
+**/wandb
+*.csv
+.vscode/
+.DS_Store
+outputs/*
+training_logs/*
+datasets/*

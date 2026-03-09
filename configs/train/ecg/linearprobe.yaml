@@ -1,0 +1,10 @@
+task: ecg_linearprobe
+
+encoder:
+  ecg:
+    checkpoint_path:
+    freeze_first_n_layers: 0
+  
+decoder:
+  checkpoint_path:
+  use_first_n_layers:
