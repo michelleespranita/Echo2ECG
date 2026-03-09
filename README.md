@@ -2,6 +2,16 @@
 
 This is the official PyTorch implementation of Echo2ECG.
 
+> **Echo2ECG: Enhancing ECG Representations with Cardiac Morphology from Multi-View Echos** <br>
+> Michelle Espranita Liman, Özgün Turgut, Alexander Müller, Eimo Martens, Daniel Rueckert, Philip Müller <br>
+
+<p align="center">
+<img src="img/Echo2ECG.png" width=80% height=80%
+class="center">
+</p>
+
+> **Abstract:** Electrocardiography (ECG) is a low-cost, widely used modality for diagnosing electrical abnormalities like atrial fibrillation by capturing the heart's electrical activity. However, it cannot directly measure cardiac morphological phenotypes, such as left ventricular ejection fraction (LVEF), which typically require echocardiography (Echo). Predicting these phenotypes from ECG would enable early, accessible health screening. Existing self-supervised methods suffer from a representational mismatch by aligning ECGs to single-view Echos, which only capture local, spatially restricted anatomical snapshots. To address this, we propose Echo2ECG, a multimodal self-supervised learning framework that enriches ECG representations with the heart's morphological structure captured in multi-view Echos. We evaluate Echo2ECG as an ECG feature extractor on two clinically relevant tasks that fundamentally require morphological information: (1) classification of structural cardiac phenotypes across three datasets, and (2) retrieval of Echo studies with similar morphological characteristics using ECG queries. Our extracted ECG representations consistently outperform those of state-of-the-art unimodal and multimodal baselines across both tasks, despite being 18x smaller than the largest baseline. These results demonstrate that Echo2ECG is a robust, powerful ECG feature extractor.
+
 ## 📋 Outline
 
 1. [Getting Started](#getting-started)
@@ -9,6 +19,7 @@ This is the official PyTorch implementation of Echo2ECG.
 3. [Data Preparation](#data-preparation)
 4. [Training and Evaluation](#training-and-evaluation)
 
+<a id="getting-started"></a>
 ## 🚀 Getting Started
 
 1. **Setup**: Complete the installation steps in the "Setup" section.
@@ -19,6 +30,7 @@ This is the official PyTorch implementation of Echo2ECG.
 
 4. **Train/Eval**: Run pre-training and kNN evaluation scripts according to your specific needs.
 
+<a id="setup"></a>
 ## 🛠 Setup
 
 ```bash
@@ -33,6 +45,7 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+<a id="data-preparation"></a>
 ## 📊 Data Preparation
 
 ### 1) ECG preprocessing
@@ -74,7 +87,7 @@ For `data_<train/val/test>`, you can provide either:
 
 `labels_<train/val/test>` must be a `.pt` tensor of shape `(num_samples, num_classes)` with one-hot encoded labels.
 
-
+<a id="training-and-evaluation"></a>
 ## 🏋🏻‍♀️ Training and Evaluation
 
 ### A) Multimodal pre-training (CLIP)
