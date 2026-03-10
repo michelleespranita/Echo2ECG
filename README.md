@@ -2,7 +2,7 @@
 
 This is the official PyTorch implementation of Echo2ECG.
 
-[![Preprint](https://img.shields.io/badge/arXiv-2303.07125-b31b1b)](https://arxiv.org/abs/2603.08505)
+[![Preprint](https://img.shields.io/badge/arXiv-2603.08505-b31b1b)](https://arxiv.org/abs/2603.08505)
 
 > **Echo2ECG: Enhancing ECG Representations with Cardiac Morphology from Multi-View Echos** <br>
 > Michelle Espranita Liman, Özgün Turgut, Alexander Müller, Eimo Martens, Daniel Rueckert, Philip Müller <br>
