@@ -1,1 +1,1 @@
-Place the OTiS model and the EchoPrime model in this folder.
+Place the Echo2ECG, OTiS, and EchoPrime model in this folder.
