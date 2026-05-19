@@ -3,6 +3,7 @@
 This is the official PyTorch implementation of Echo2ECG.
 
 [![Preprint](https://img.shields.io/badge/arXiv-2603.08505-b31b1b)](https://arxiv.org/abs/2603.08505)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **Echo2ECG: Enhancing ECG Representations with Cardiac Morphology from Multi-View Echos** <br>
 > Michelle Espranita Liman, Özgün Turgut, Alexander Müller, Eimo Martens, Daniel Rueckert, Philip Müller <br>
@@ -18,19 +19,38 @@ class="center">
 
 1. [Getting Started](#getting-started)
 2. [Setup](#setup)
-3. [Data Preparation](#data-preparation)
-4. [Training and Evaluation](#training-and-evaluation)
+3. [Model Usage](#model-usage)
+4. [Data Preparation](#data-preparation)
+5. [Training and Evaluation](#training-and-evaluation)
 
 <a id="getting-started"></a>
 ## 🚀 Getting Started
 
-1. **Setup**: Complete the installation steps in the "Setup" section.
+**Use the pre-trained ECG model out-of-the-box in four steps:**
 
-2. **Models**: Download OTiS and EchoPrime model weights and place them in the `model_weights` directory.
+**1. Install**
+```bash
+conda create -n echo2ecg python=3.12 && conda activate echo2ecg
+pip install -r requirements.txt && pip install -e .
+```
 
-3. **Data**: Prepare your datasets as described in the "Data Preparation" section.
+**2. Download model weights**
 
-4. **Train/Eval**: Run pre-training and kNN evaluation scripts according to your specific needs.
+Download the pre-trained Echo2ECG weights [here](https://drive.google.com/drive/folders/1CNzxjiKcb_1CwqtMSgvJCjY5kLUlJhi2?usp=sharing) and place them in the `model_weights/` directory.
+
+**3. Preprocess your ECGs**
+```bash
+python ecg/data_processing/processing.py \
+    --input_dir INPUT_DIR \
+    --output_dir OUTPUT_DIR \
+    --original_freq FREQ
+```
+
+**4. Extract ECG embeddings** — see the [Model Usage](#model-usage) section for the full inference snippet.
+
+---
+
+For training your own model, see [Data Preparation](#data-preparation) and [Training and Evaluation](#training-and-evaluation).
 
 <a id="setup"></a>
 ## 🛠 Setup
@@ -47,17 +67,63 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+<a id="model-usage"></a>
+## 🫀 Model Usage
+
+```python
+import torch
+
+import ecg.models.ECGEncoder as ecg_enc
+from ecg.models.token_aggregation.TokenAggregator import TokenAggregator
+
+# load checkpoint
+checkpoint = torch.load('./model_weights/echo2ecg.ckpt', map_location='cpu', weights_only=False)
+cfg = checkpoint['cfg']
+
+# load ECG encoder
+ecg_encoder = ecg_enc.__dict__[cfg.model.ecg.model_name](
+    img_size=cfg.model.ecg.input_size,
+    patch_size=cfg.model.ecg.patch_size, 
+    drop_path_rate=cfg.model.ecg.drop_path_rate,
+    use_adapter=cfg.model.ecg.use_adapter,
+    adapter_bottleneck_dim=cfg.model.ecg.adapter_bottleneck_dim,
+    use_checkpoint=cfg.model.ecg.use_checkpoint
+)
+ecg_encoder.load_state_dict(checkpoint['ecg_encoder'], strict=False)
+ecg_encoder.eval()
+
+# load token aggregator (optional)
+token_aggregator = TokenAggregator(cfg, cfg.model.ecg)
+token_aggregator.load_state_dict(checkpoint['token_aggregator'], strict=True)
+token_aggregator.eval()
+
+# extract ECG embeddings
+ecg = torch.randn(1, 1, 12, 1008) # (batch_size, C, V, T)
+with torch.no_grad():
+    ecg_local_tokens = ecg_encoder.forward_features(ecg) # (B, 1+N, D) where "1+" is the CLS token
+    
+    # using token aggregator to produce a global token
+    ecg_global_token = token_aggregator(ecg_local_tokens)['ecg_global_token'] # (batch_size, embed_dim)
+
+    # not using token aggregator
+    ecg_global_token = ecg_local_tokens[:, 1:, :].mean(dim=1) # exclude the CLS token (batch_size, embed_dim)
+
+```
+
 <a id="data-preparation"></a>
 ## 📊 Data Preparation
 
 ### 1) ECG preprocessing
 
 ```bash
-python ecg/data_processing/processing.py --input_dir INPUT_DIR --output_dir OUTPUT_DIR
+python ecg/data_processing/processing.py --input_dir INPUT_DIR --output_dir OUTPUT_DIR --original_freq FREQ
 ```
 where:
 - `INPUT_DIR`: path to the directory containing ECGs to process
 - `OUTPUT_DIR`: path to the directory saving the processed ECGs
+- `FREQ`: the original frequency of the ECGs to process (Hz)
+
+⚠️ ECGs before preprocessing may be saved in different formats. Please edit the code if necessary to ensure that they are read properly.
 
 ### 2) Echo embeddings for multimodal pre-training
 
@@ -163,3 +229,23 @@ To add a new downstream ECG task, add a new config file `<downstream-task>.yaml 
 ### C) ECG->Echo Retrieval
 
 Coming soon
+
+## 📄 Citation
+
+If you find this work useful, please cite:
+
+```bibtex
+@misc{liman2026echo2ecgenhancingecgrepresentations,
+      title={Echo2ECG: Enhancing ECG Representations with Cardiac Morphology from Multi-View Echos}, 
+      author={Michelle Espranita Liman and Özgün Turgut and Alexander Müller and Eimo Martens and Daniel Rueckert and Philip Müller},
+      year={2026},
+      eprint={2603.08505},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2603.08505}, 
+}
+```
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
