@@ -205,18 +205,25 @@ if __name__ == '__main__':
     argparse = ArgumentParser()
     argparse.add_argument('--input_dir', type=str)
     argparse.add_argument('--output_dir', type=str)
+    argparse.add_argument('--original_freq', type=float, default=500,
+                          help='frequency of the ECGs in the dataset')
     args = argparse.parse_args()
 
     INPUT_DIR = args.input_dir
     OUTPUT_DIR = args.output_dir
+
+    original_freq = args.original_freq
     
     failed = []
     for f in tqdm(os.listdir(INPUT_DIR)):
         try:
-            ecg, _, metadata = read_ecg(os.path.join(INPUT_DIR, f)) # ecg: (V, T)
-            ecg = torch.from_numpy(ecg)
-            proc_ecg = process_ecg(ecg)
+            ecg = torch.load(os.path.join(INPUT_DIR, f)) # expected shape: (num_leads, num_timesteps)
 
+            if original_freq != 500:
+                ecg = resample_signal(ecg, current_freq=original_freq, target_freq=500) # (num_leads, num_timesteps)
+            
+            proc_ecg = process_ecg(ecg) # (num_leads, new_num_timesteps) if resampled, else (num_leads, num_timesteps)
+            
             torch.save(torch.from_numpy(proc_ecg), os.path.join(OUTPUT_DIR, f'{f}.pt'))
         
         except:
