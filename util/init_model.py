@@ -57,13 +57,14 @@ def init_ecg_encoder(cfg: DictConfig) -> Tuple[nn.Module, DictConfig]:
             # Interpolate pos_embed_x if necessary and load it into model
             interpolate_pos_embed_x(ecg_encoder, checkpoint['model'])
 
-        else:
+        else: # ex: echo2ecg.ckpt, multimodal pretraining
             checkpoint = torch.load(cfg.train.encoder.ecg.checkpoint_path, map_location='cpu', weights_only=False)
 
             # Don't load pos_embed_x just yet
             exclude_keys = ['pos_embed_x']
+            model_key = 'model' if 'model' in checkpoint else 'ecg_encoder' # ecg_encoder for echo2ecg.ckpt, model for multimodal pretraining
             filtered_state_dict = {
-                k: v for k, v in checkpoint['model'].items()
+                k: v for k, v in checkpoint[model_key].items()
                 if not any(excluded in k for excluded in exclude_keys)
             }
 
@@ -72,7 +73,7 @@ def init_ecg_encoder(cfg: DictConfig) -> Tuple[nn.Module, DictConfig]:
             print(msg)
     
             # Interpolate pos_embed_x if necessary and load it into model
-            interpolate_pos_embed_x(ecg_encoder, checkpoint['model'])
+            interpolate_pos_embed_x(ecg_encoder, checkpoint[model_key])
     
     else:
         print('The ECG encoder is randomly initialized!')
