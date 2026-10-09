@@ -226,10 +226,6 @@ Important configs:
 
 To add a new downstream ECG task, add a new config file `<downstream-task>.yaml `in the `configs/downstream_task_ecg` folder and pass it via `downstream_task_ecg=<downstream-task>`.
 
-### C) ECG->Echo Retrieval
-
-Coming soon
-
 ## 📄 Citation
 
 If you find this work useful, please cite:
